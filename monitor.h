@@ -7,6 +7,8 @@
 void monitor_put(char c);
 void monitor_put_styled(char c, int fg, int bg);
 
+void monitor_move_cursor(uint8_t x, uint8_t y);
+
 /// clears screen
 void monitor_clear();
 

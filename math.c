@@ -13,3 +13,25 @@ float cos(float n)
     __asm volatile("fcos" : "=t" (ret) : "0" (n));
     return ret;
 }
+
+float sqrt(float n)
+{
+    float ret;
+    __asm volatile("fsqrt" : "=t" (ret) : "0" (n));
+    return ret;
+}
+
+float fabs(float n)
+{
+    float ret;
+    __asm volatile("fabs" : "=t" (ret) : "0" (n));
+    return ret;
+}
+
+float distance(float x1, float y1, float x2, float y2)
+{
+    float x = fabs(x2-x1);
+    float y = fabs(y2-y1);
+    return sqrt(x+y);
+}
+

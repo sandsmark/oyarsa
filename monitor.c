@@ -14,6 +14,13 @@ static void move_cursor()
     outb(0x3d5, location);
 }
 
+void monitor_move_cursor(uint8_t x, uint8_t y)
+{
+    cursor_x = x;
+    cursor_y = y;
+    move_cursor();
+}
+
 static void scroll()
 {
     uint8_t attribute = (0 /* black*/ << 4) | (15 /* white */ & 0x0f);
@@ -117,10 +124,10 @@ void monitor_write_dec(uint32_t n)
 {
     char buf[11] = {0}; // Can never be more than 11 digits (log10(2^32) = 9.63, and we also reserve 1 for \0)
     char *cur = buf + 10;
-    while (n > 0) {
+    do {
         cur--;
         *cur = n%10 + '0';
         n /= 10;
-    }
+    } while(n > 0);
     monitor_write(cur);
 }
