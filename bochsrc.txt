@@ -1,4 +1,3 @@
 floppya: 1_44=floppy.img, status=inserted
 log: bochsout.txt
-display_library: sdl
 

@@ -1,4 +1,4 @@
-OBJECTS=boot.o main.o common.o monitor.o math.o
+OBJECTS=boot.o main.o common.o monitor.o math.o gdt_s.o gdt.o effects.o
 CFLAGS=-nostdlib -nostdinc -fno-builtin -fno-stack-protector -m32 -std=c99
 LDFLAGS=-Tlink.ld -melf_i386
 ASFLAGS=-felf
