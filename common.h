@@ -16,8 +16,8 @@ void outb(uint16_t port, uint8_t value);
 uint8_t inb(uint16_t port);
 uint16_t inw(uint16_t port);
 
-void memcpy(uint8_t *dest, const uint8_t *src, size_t num);
-void memset(uint8_t *dst, char c, size_t num);
+void memcpy(void *dest, const void *src, size_t num);
+void memset(void *dst, char c, size_t num);
 size_t strlen(const char *str);
 int strcmp(const char *s1, const char *s2);
 

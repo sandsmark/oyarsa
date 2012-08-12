@@ -19,14 +19,17 @@ uint16_t inw(uint16_t port)
     return ret;
 }
 
-void memcpy(uint8_t *dest, const uint8_t *src, size_t num)
+void memcpy(void *_dst, const void *_src, size_t num)
 {
+    uint8_t *dst = (uint8_t*)_dst;
+    uint8_t *src = (uint8_t*)_src;
     for (size_t i=0; i<num; i++)
-        dest[i] = src[i];
+        dst[i] = src[i];
 }
 
-void memset(uint8_t *dst, char c, size_t num)
+void memset(void *_dst, char c, size_t num)
 {
+    uint8_t *dst = (uint8_t*)_dst;
     for (size_t i=0; i<num; i++)
         dst[i] = c;
 }
