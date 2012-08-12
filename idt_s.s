@@ -1,5 +1,7 @@
 extern idt_handler;
+extern irq_handler;
 
+; This is called by the individual interrupt handlers
 isr_common_stub:
     pusha ; Pushes edi,esi,ebp,esp,ebx,edx,ecx,eax
 
@@ -26,9 +28,42 @@ isr_common_stub:
 
     popa ; pops back edi,esi,ebp,esp,ebx,edx,ecx,eax
     add esp, 8 ; clean the error code and interrupt number
+    sti ; we wants interrupts now
+    iret ; interrupt return, pops 5 things at once: CS, EIP, EFLAGS, SS, and ESP
+.end:
+
+irq_common_stub:
+    pusha ; Pushes edi,esi,ebp,esp,ebx,edx,ecx,eax
+
+    mov ax, ds ; least significant two bytes of eax <= ds
+    push eax ; store data segment for later
+
+    mov ax, 0x10 ; Load the kernel data segment descriptor
+    mov ds, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
+    mov ss, ax
+
+    push esp ; Push a pointer to the current top of stack - this becomes the registers_t* parameter.
+    call irq_handler ; C code
+    add esp, 4 ; Remove the registers_t* parameter.
+
+    pop ebx ; pop back the original data segment descriptor
+    mov ds, bx
+    mov es, bx
+    mov fs, bx
+    mov gs, bx
+    mov ss, bx
+
+    popa ; pops back edi,esi,ebp,esp,ebx,edx,ecx,eax
+    add esp, 8 ; clean the error code and interrupt number
+    sti ; we wants interrupts now
     iret ; pops 5 things at once: CS, EIP, EFLAGS, SS, and ESP
 .end:
 
+
+; Macros to make implementation of handlers easier
 
 %macro ISR_NOERRCODE 1
 global isr%1
@@ -47,6 +82,17 @@ isr%1:
     jmp isr_common_stub
 %endmacro
 
+%macro IRQ 2
+global irq%1
+irq%1:
+    cli
+    push byte 0
+    push byte %2
+    jmp irq_common_stub
+%endmacro
+
+
+; List of actual handlers
 ISR_NOERRCODE 0
 ISR_NOERRCODE 1
 ISR_NOERRCODE 2
@@ -79,6 +125,20 @@ ISR_NOERRCODE 28
 ISR_NOERRCODE 29
 ISR_NOERRCODE 30
 ISR_NOERRCODE 31
+IRQ  0,       32
+IRQ  1,       33
+IRQ  2,       34
+IRQ  3,       35
+IRQ  4,       36
+IRQ  5,       37
+IRQ  6,       38
+IRQ  7,       39
+IRQ  8,       40
+IRQ  9,       41
+IRQ  10,      42
+IRQ  11,      43
+IRQ  12,      44
+IRQ  13,      45
+IRQ  14,      46
+IRQ  15,      47
 ISR_NOERRCODE 255
-
-

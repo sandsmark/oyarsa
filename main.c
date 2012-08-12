@@ -5,17 +5,20 @@
 #include "gdt.h"
 #include "idt.h"
 #include "effects.h"
+#include "timer.h"
 
 int kernel_main(multiboot_t *mboot)
 {
+    monitor_clear();
+    monitor_write("oyarsa 0.1\n");
+
     gdt_init();
     idt_init();
-    __asm volatile("int $0x3");
+    timer_init(20);
+    __asm volatile("sti");
 
-//    monitor_clear();
-//    monitor_write("Hello world!");
 
-//    effects_run();
+    effects_run();
 
     return 0xdeadbeef;
 }

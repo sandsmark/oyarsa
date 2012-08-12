@@ -41,7 +41,7 @@ start:
     cli                         ; Disable interrupts.
     mov esp, stack              ; Set up our own stack.
     push ebx                    ; Push a pointer to the multiboot info structure.
-    mov ebp, 0                  ; Initialise the base pointer to zero so we can 
+    mov ebp, 0                  ; Initialise the base pointer to zero so we can
                                 ; terminate stack traces here.
     call kernel_main            ; call our main() function.
     jmp $                       ; Enter an infinite loop, to stop the processor
