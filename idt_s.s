@@ -1,12 +1,3 @@
-global idt_flush:function idt_flush.end-idt_flush
-
-idt_flush:
-    mov eax, [esp+4]
-    lidt [eax]
-    ret
-.end:
-
-
 extern idt_handler;
 
 isr_common_stub:

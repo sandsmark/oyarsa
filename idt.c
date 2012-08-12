@@ -2,8 +2,6 @@
 #include "monitor.h"
 #include "idt.h"
 
-extern void idt_flush(uint32_t); // this is in idt_s.s
-
 // This is the IDT
 idt_entry_t idt_entries [256];
 
@@ -70,8 +68,7 @@ void idt_init()
     idt_set_gate (31, (uint32_t)isr31, 0x08, 0x8E);
 
     // Send the IDT to the CPU
-    idt_flush ((uint32_t)&idt_ptr);
-    //__asm volatile("lidt (%0)" : : "r"((uint32_t)&idt_ptr));
+    __asm volatile("lidt (%0)" : : "r"((uint32_t)&idt_ptr));
 }
 
 void idt_handler(registers_t *regs)
