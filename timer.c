@@ -16,10 +16,10 @@ static void timer_callback(registers_t *regs)
 {
     tick++;
 
-    monitor_move_cursor(62, 0);
-    monitor_write("Timer tick: ");
-    monitor_write_dec(tick);
-    monitor_put('\n');
+//    monitor_move_cursor(62, 0);
+//    monitor_write("Timer tick: ");
+//    monitor_write_dec(tick);
+//    monitor_put('\n');
 }
 
 void timer_init(uint32_t freq)

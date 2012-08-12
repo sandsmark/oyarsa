@@ -21,5 +21,8 @@ void memset(void *dst, char c, size_t num);
 size_t strlen(const char *str);
 int strcmp(const char *s1, const char *s2);
 
+void print_stacktrace();
+void panic(const char *msg);
+
 #endif//COMMON_H
 

@@ -6,6 +6,9 @@
 #include "idt.h"
 #include "effects.h"
 #include "timer.h"
+#include "elf.h"
+
+elf_t kernel_elf;
 
 int kernel_main(multiboot_t *mboot)
 {
@@ -15,10 +18,11 @@ int kernel_main(multiboot_t *mboot)
     gdt_init();
     idt_init();
     timer_init(20);
+    kernel_elf = elf_from_multiboot(mboot);
+
     __asm volatile("sti");
 
-
-    effects_run();
+    panic("Testing!");
 
     return 0xdeadbeef;
 }
