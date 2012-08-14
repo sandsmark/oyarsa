@@ -1,6 +1,8 @@
 #ifndef IDT_H
 #define IDT_H
 
+#include "common.h"
+
 // Defines to make life easier
 #define IRQ0 32
 #define IRQ1 33
