@@ -9,6 +9,7 @@
 #include "elf.h"
 #include "pmm.h"
 #include "vmm.h"
+#include "heap.h"
 
 elf_t kernel_elf;
 
