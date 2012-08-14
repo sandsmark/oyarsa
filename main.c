@@ -27,28 +27,32 @@ int kernel_main(multiboot_t *mboot)
     pmm_init(mboot->mem_upper);
     monitor_write("Initializing virtual memory...\n");
     vmm_init();
-    monitor_write("Parsing ELF from multiboot...\n");
+    monitor_write("Parsing ELF...\n");
     kernel_elf = elf_from_multiboot(mboot);
 
+    monitor_write("Looking for memory... ");
     // find free memory
     uint32_t ptr = mboot->mmap_addr;
+    uint32_t amount = 0;
     while (ptr < mboot->mmap_addr + mboot->mmap_length) {
         mmap_entry_t *map = (mmap_entry_t*)ptr;
 
         if (map->type == 1) { // type == RAM
             for (uint32_t page = map->base_addr_low; page < map->base_addr_low + map->length_low; page += PAGE_SIZE) {
-                monitor_write("freeing page\n");
                 pmm_free_page(page);
+                amount++;
             }
         }
 
         ptr += map->size + sizeof(uint32_t);
     }
+    monitor_write_dec(amount * 4 / 1024);
+    monitor_write("MB found!\n");
 
 
     __asm volatile("sti");
 
-
+    panic("Testing panic button! :D");
 
     return 0xdeadbeef;
 }

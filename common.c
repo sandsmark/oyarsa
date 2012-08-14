@@ -32,10 +32,8 @@ void memcpy(void *_dst, const void *_src, size_t num)
 void memset(void *_dst, char c, size_t num)
 {
     uint8_t *dst = (uint8_t*)_dst;
-/*for (size_t i=0; i<num; i++)
-        dst[i] = c;*/
-    monitor_write("zeroing..\n");
-    for (;num!=0;num--) *dst++=c;
+    for (size_t i=0; i<num; i++)
+        dst[i] = c;
 }
 
 size_t strlen(const char *str)

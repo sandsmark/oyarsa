@@ -20,12 +20,10 @@ uint32_t pmm_alloc_page()
         if (pmm_stack_loc == PMM_STACK_OFFSET)
             panic("Out of memory");
 
-        monitor_write("GANDAM STYLE\n");
         pmm_stack_loc -= sizeof(uint32_t);
         uint32_t *stack = (uint32_t*)pmm_stack_loc;
         return *stack;
     } else {
-        monitor_write("lol old fashioned style\n");
         return pmm_location += PAGE_SIZE;
     }
 }

@@ -31,29 +31,25 @@ void vmm_init()
     pt = (uint32_t*)(pd[1022] & PAGE_MASK);
     memset(pt, 0, PAGE_SIZE);
 
+    // http://wiki.osdev.org/Paging#Manipulation
+    //
     // The last entry of the second-last table is the directory itself.
     pt[1023] = (uint32_t)pd | PAGE_PRESENT | PAGE_WRITE;
+    // ..and the last table loops back on the directory
+    pd[1023] = (uint32_t)pd | PAGE_PRESENT | PAGE_WRITE;
 
 
-    monitor_write("Switching page...\n");
     switch_page_directory(pd);
 
-    monitor_write("Turning on paging...\n");
     // turn on paging
     uint32_t cr0;
     __asm volatile("mov %%cr0, %0" : "=r"(cr0));
     cr0 |= 0x80000000;
     __asm volatile("mov %0, %%cr0" : : "r"(cr0));
 
-    monitor_write("Mapping the physical memory manager's page stack...\n");
-
     uint32_t pt_idx = PAGE_DIR_IDX((PMM_STACK_OFFSET>>12));
-    monitor_write("allocing page...\n");
     page_directory[pt_idx] = pmm_alloc_page() | PAGE_PRESENT | PAGE_WRITE;
-    monitor_write("zeroing out...\n");
-    memset (page_tables[pt_idx*1024], 0, 0x1000);
-//    memset((uint32_t*)page_tables[pt_idx*1024], 0, PAGE_SIZE);
-    monitor_write("HEHELOL\n");
+    memset((uint32_t*)page_tables[pt_idx*1024], 0, PAGE_SIZE);
 
     pmm_paging_active=1;
 }
