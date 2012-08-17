@@ -9,7 +9,7 @@
 #include "elf.h"
 #include "pmm.h"
 #include "vmm.h"
-#include "heap.h"
+#include "scheduler.h"
 
 elf_t kernel_elf;
 
@@ -49,6 +49,10 @@ int kernel_main(multiboot_t *mboot)
     }
     monitor_write_dec(amount * 4 / 1024);
     monitor_write("MB found!\n");
+
+
+    monitor_write("Initializing scheduler...\n");
+    scheduler_init(threading_init());
 
 
     __asm volatile("sti");
