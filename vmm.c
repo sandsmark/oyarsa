@@ -68,7 +68,7 @@ void map(uint32_t va, uint32_t pa, uint32_t flags)
     if (page_directory[pt_idx] == 0) {
         // create page
         page_directory[pt_idx] = pmm_alloc_page() | PAGE_PRESENT | PAGE_WRITE;
-        memset((uint32_t*)page_tables[pt_idx*PAGE_SIZE], 0, PAGE_SIZE);
+        memset((uint32_t*)page_tables[pt_idx*1024], 0, PAGE_SIZE);
     }
 
     page_tables[virtual_page] = (pa & PAGE_MASK) | flags;
