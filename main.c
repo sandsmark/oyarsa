@@ -47,8 +47,8 @@ int kernel_main(multiboot_t *mboot)
 
         ptr += map->size + sizeof(uint32_t);
     }
-    monitor_write_dec(amount * 4 / 1024);
-    monitor_write("MB found!\n");
+    monitor_write_dec(amount / 256);
+    monitor_write("MB free!\n");
 
 
     monitor_write("Initializing scheduler...\n");

@@ -1,33 +1,48 @@
-/* link.ld -- Linker script for the kernel - ensure everything goes in the */
-/*            Correct place.  */
-/*            Original file taken from Bran's Kernel Development */
-/*            tutorials: http://www.osdever.net/bkerndev/index.php. */
+ENTRY (loader)
 
-ENTRY(start)
 SECTIONS
 {
-  .text 0x100000 :
-  {
-    code = .; _code = .; __code = .;
-    *(.text)
-    . = ALIGN(4096);
-  }
+    . = 0x00100000;
 
-  .data :
-  {
-     data = .; _data = .; __data = .;
-     *(.data)
-     *(.rodata)
-     . = ALIGN(4096);
-  }
+    .text ALIGN (0x1000) :
+    {
+        *(.text)
+        *(.gnu.linkonce.t*)
+    }
 
-  .bss :
-  {
-    bss = .; _bss = .; __bss = .;
-    *(.bss)
-    . = ALIGN(4096);
-  }
+    .rodata ALIGN (0x1000) :
+    {
+        start_ctors = .;
+        *(SORT(.ctors*))  /* Note the "SORT" */
+        end_ctors = .;
 
-  end = .; _end = .; __end = .;
+        start_dtors = .;
+        *(SORT(.dtors*))
+        end_dtors = .;
+
+        *(.rodata*)
+        *(.gnu.linkonce.r*)
+    }
+
+    .data ALIGN (0x1000) :
+    {
+        *(.data)
+        *(.gnu.linkonce.d*)
+    }
+
+    .bss :
+    {
+        sbss = .;
+        *(COMMON)
+        *(.bss)
+        *(.gnu.linkonce.b*)
+        ebss = .;
+    }
+
+    /DISCARD/ :
+    {
+        *(.comment)
+        *(.eh_frame) /* discard this, unless you are implementing runtime support for C++ exceptions. */
+    }
 }
 
