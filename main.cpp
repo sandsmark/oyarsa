@@ -1,3 +1,4 @@
+extern "C" {
 #include "common.h"
 #include "multiboot.h"
 #include "monitor.h"
@@ -10,10 +11,10 @@
 #include "pmm.h"
 #include "vmm.h"
 #include "scheduler.h"
-
+}
 elf_t kernel_elf;
 
-int kernel_main(multiboot_t *mboot)
+extern "C" int kernel_main(multiboot_t *mboot)
 {
     monitor_clear();
     monitor_write("oyarsa 0.1\n");
