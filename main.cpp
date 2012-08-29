@@ -62,3 +62,9 @@ extern "C" int kernel_main(multiboot_t *mboot)
 
     return 0xdeadbeef;
 }
+
+// This just needs to be here so we can have pure virtual functions
+extern "C" void __cxa_pure_virtual()
+{
+    // Do nothing or print an error message.
+}

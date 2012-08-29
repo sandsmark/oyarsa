@@ -105,6 +105,7 @@ static char num_to_hex(uint32_t b)
     } else {
         r = b + '0';
     }
+    return r;
 }
 void monitor_write_hex(uint32_t n)
 {
