@@ -25,11 +25,9 @@ private:
 
     ~GdtManager();
 
-    void setGate(int32_t num, uint32_t base, uint32_t limit, uint8_t access, uint8_t granularity);
+    static void setGate(int32_t num, uint32_t base, uint32_t limit, uint8_t access, uint8_t granularity);
 
-    size_t m_entries;
-    GdtEntry m_gdt[3];
-    static GdtManager *m_instance;
+    static GdtEntry m_gdt[3];
 };
 
 #endif//GDT_H

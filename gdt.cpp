@@ -9,7 +9,7 @@ extern "C" {
 extern "C" void gdt_flush (uint32_t);
 
 // The GDT object is
-GdtManager *GdtManager::m_instance = 0;
+GdtEntry GdtManager::m_gdt[3];
 
 // Used when passing the pointer to our GDT
 struct GdtPointer
@@ -26,14 +26,6 @@ GdtPointer gdt_ptr;
 
 void GdtManager::initialize()
 {
-    if (m_instance) // We are already initialized
-        return;
-
-    m_instance = new GdtManager();
-}
-
-GdtManager::GdtManager()
-{
     gdt_ptr.pointer = (uint32_t)&m_gdt; // pointer to our structure
     gdt_ptr.entries = 3*sizeof(m_gdt) - 1; // last valid byte is size - 1
 
@@ -44,7 +36,6 @@ GdtManager::GdtManager()
     // push to CPU
     gdt_flush((uint32_t) &gdt_ptr);
 }
-
 
 void GdtManager::setGate(int32_t num, uint32_t base, uint32_t limit, uint8_t access, uint8_t granularity)
 {

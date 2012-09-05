@@ -18,6 +18,8 @@ extern "C" int kernel_main(multiboot_t *mboot)
 {
     monitor_clear();
     monitor_write("oyarsa 0.1\n");
+    monitor_write("Initializing global descriptor table...\n");
+    GdtManager::initialize();
     monitor_write("Initializing interrupt table...\n");
     idt_init();
     monitor_write("Initializing timer...\n");
@@ -25,8 +27,6 @@ extern "C" int kernel_main(multiboot_t *mboot)
     monitor_write("Initializing physical memory...\n");
     pmm_init(mboot->mem_upper);
     monitor_write("Initializing virtual memory...\n");
-    monitor_write("Initializing global descriptor table...\n");
-    GdtManager::initialize();
     vmm_init();
     monitor_write("Parsing ELF...\n");
     kernel_elf = elf_from_multiboot(mboot);
