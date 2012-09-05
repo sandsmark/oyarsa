@@ -16,12 +16,12 @@ void thread_is_ready(thread_t *t)
     thread_list_t *item = thread_list;
     while (item->next)
         item = item->next;
-    
-    thread_list_t *new = kmalloc(sizeof(thread_list_t));
-    new->thread = t;
-    new->next = thread_list;
 
-    item->next = new;
+    thread_list_t *n = kmalloc(sizeof(thread_list_t));
+    n->thread = t;
+    n->next = thread_list;
+
+    item->next = n;
 }
 
 void thread_is_not_ready(thread_t *t)
