@@ -5,17 +5,22 @@
 
 #define PMM_STACK_OFFSET 0xFF000000
 
+class PhysMemManager {
+public:
+    static void initialize(uint32_t start);
 
-// get the address of a physical page
-uint32_t pmm_alloc_page();
+    static uint32_t allocatePage();
+    static void freePage(uint32_t page);
 
-// free a page
-void pmm_free_page(uint32_t p);
+    static bool pagingActive;
 
-// are we initialized?
-extern char pmm_paging_active;
+private:
+    PhysMemManager();
+    PhysMemManager(const PhysMemManager&);
 
-// initialize the physical memory manager
-void pmm_init(uint32_t start);
+    static uint32_t m_location;
+    static uint32_t m_stackLocation;
+    static uint32_t m_maxPosition;
+};
 
 #endif//PMM_H

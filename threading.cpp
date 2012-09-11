@@ -1,17 +1,21 @@
+extern "C" {
+#include "common.h"
+#include "monitor.h"
+}
 #include "threading.h"
 #include "heap.h"
-#include "monitor.h"
-
 uint32_t next_tid = 0;
 
 thread_t *current_thread;
 
 thread_t *threading_init()
 {
-    thread_t *thread = kmalloc(sizeof(thread_t));
+    thread_t *thread = new thread_t; //kmalloc(sizeof(thread_t));
     thread->id = next_tid++;
-    
+
     current_thread = thread;
+
+    return thread;
 }
 
 void thread_exit()
@@ -25,7 +29,7 @@ void thread_exit()
 
 thread_t *create_thread(int (*function)(void*), void *arg, uint32_t *stack)
 {
-    thread_t *thread = kmalloc(sizeof(thread_t));
+    thread_t *thread = new thread_t;//kmalloc(sizeof(thread_t));
     memset(thread, 0, sizeof(thread_t));
     thread->id = next_tid++;
 

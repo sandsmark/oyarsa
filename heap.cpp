@@ -42,8 +42,8 @@ void *kmalloc(size_t len)
 
     // Grow our heap until we fit
     while (chunk_start + len > heap_max) {
-        uint32_t page = pmm_alloc_page();
-        map(heap_max, page, PAGE_PRESENT | PAGE_WRITE);
+        uint32_t page = PhysMemManager::allocatePage();
+        VirtualMemoryManager::map(heap_max, page, PAGE_PRESENT | PAGE_WRITE);
         heap_max += PAGE_SIZE;
     }
 
@@ -82,9 +82,9 @@ void kfree(void *p)
         while ((heap_max - PAGE_SIZE) >= (uint32_t)header) {
             heap_max -= PAGE_SIZE;
             uint32_t page;
-            get_mapping(heap_max, &page);
-            pmm_free_page(page);
-            unmap(heap_max);
+            VirtualMemoryManager::getMapping(heap_max, &page);
+            PhysMemManager::freePage(page);
+            VirtualMemoryManager::unmap(heap_max);
         }
     }
 }

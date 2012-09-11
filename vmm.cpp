@@ -1,33 +1,32 @@
+extern "C" {
+#include "common.h"
+#include "monitor.h"
 #include "idt.h"
+}
 #include "vmm.h"
 #include "pmm.h"
-#include "monitor.h"
 
-uint32_t *page_directory = (uint32_t*)PAGE_DIR_VIRTUAL_ADDR;
-uint32_t *page_tables = (uint32_t*)PAGE_TABLE_VIRTUAL_ADDR;
+uint32_t *VirtualMemoryManager::m_directory = (uint32_t*)PAGE_DIR_VIRTUAL_ADDR;
+uint32_t *VirtualMemoryManager::m_tables = (uint32_t*)PAGE_TABLE_VIRTUAL_ADDR;
 
-page_directory_t *current_directory;
-
-extern char pmm_paging_active;
-
-void vmm_init()
+void VirtualMemoryManager::initialize()
 {
-    idt_register_interrupt_handler(14, &page_fault);
+    idt_register_interrupt_handler(14, &pagefaultHandler);
 
     // allocate a page directory
-    page_directory_t *pd = (page_directory_t*)pmm_alloc_page();
+    page_directory_t *pd = (page_directory_t*)PhysMemManager::allocatePage();
 
     // zero it out
     memset(pd, 0, PAGE_SIZE);
 
-    pd[0] = pmm_alloc_page() | PAGE_PRESENT | PAGE_WRITE;
+    pd[0] = PhysMemManager::allocatePage() | PAGE_PRESENT | PAGE_WRITE;
     uint32_t *pt = (uint32_t*)(pd[0] & PAGE_MASK);
     for (int i=0; i<1024; i++) {
         pt[i] = i*PAGE_SIZE | PAGE_PRESENT | PAGE_WRITE;
     }
 
     // assign second last table and zero out
-    pd[1022] = pmm_alloc_page() | PAGE_PRESENT | PAGE_WRITE;
+    pd[1022] = PhysMemManager::allocatePage() | PAGE_PRESENT | PAGE_WRITE;
     pt = (uint32_t*)(pd[1022] & PAGE_MASK);
     memset(pt, 0, PAGE_SIZE);
 
@@ -39,7 +38,7 @@ void vmm_init()
     pd[1023] = (uint32_t)pd | PAGE_PRESENT | PAGE_WRITE;
 
 
-    switch_page_directory(pd);
+    switchDirectory(pd);
 
     // turn on paging
     uint32_t cr0;
@@ -48,58 +47,59 @@ void vmm_init()
     __asm volatile("mov %0, %%cr0" : : "r"(cr0));
 
     uint32_t pt_idx = PAGE_DIR_IDX((PMM_STACK_OFFSET>>12));
-    page_directory[pt_idx] = pmm_alloc_page() | PAGE_PRESENT | PAGE_WRITE;
-    memset((uint32_t*)page_tables[pt_idx*1024], 0, PAGE_SIZE);
+    m_directory[pt_idx] = PhysMemManager::allocatePage() | PAGE_PRESENT | PAGE_WRITE;
+    memset((uint32_t*)m_tables[pt_idx*1024], 0, PAGE_SIZE);
 
-    pmm_paging_active=1;
+    PhysMemManager::pagingActive = true;
 }
 
-void switch_page_directory(page_directory_t *pd)
+void VirtualMemoryManager::switchDirectory(page_directory_t *pd)
 {
-    current_directory = pd;
     __asm volatile("mov %0, %%cr3" : : "r"(pd));
 }
 
-void map(uint32_t va, uint32_t pa, uint32_t flags)
+void VirtualMemoryManager::map(uint32_t va, uint32_t pa, uint32_t flags)
 {
     uint32_t virtual_page = va / PAGE_SIZE;
     uint32_t pt_idx = PAGE_DIR_IDX(virtual_page);
 
-    if (page_directory[pt_idx] == 0) {
+    if (m_directory[pt_idx] == 0) {
         // create page
-        page_directory[pt_idx] = pmm_alloc_page() | PAGE_PRESENT | PAGE_WRITE;
-        memset((uint32_t*)page_tables[pt_idx*1024], 0, PAGE_SIZE);
+        m_directory[pt_idx] = PhysMemManager::allocatePage() | PAGE_PRESENT | PAGE_WRITE;
+        memset((uint32_t*)m_tables[pt_idx*1024], 0, PAGE_SIZE);
     }
 
-    page_tables[virtual_page] = (pa & PAGE_MASK) | flags;
+    m_tables[virtual_page] = (pa & PAGE_MASK) | flags;
 }
 
-void unmap(uint32_t va)
+void VirtualMemoryManager::unmap(uint32_t va)
 {
     uint32_t virtual_page = va / PAGE_SIZE;
-    page_tables[virtual_page] = 0;
+    m_tables[virtual_page] = 0;
 
     // tell the CPU that we invalidated it, clears the entry in the TLB
     __asm volatile("invlpg (%0)" : : "a"(va));
 }
 
-char get_mapping(uint32_t va, uint32_t *pa)
+char VirtualMemoryManager::getMapping(uint32_t va, uint32_t *pa)
 {
     uint32_t virtual_page = va/PAGE_SIZE;
     uint32_t pt_idx = PAGE_DIR_IDX(virtual_page);
 
-    if (page_directory[pt_idx] == 0) {
+    if (m_directory[pt_idx] == 0) {
         return 0;//return false
     }
 
-    if (page_tables[virtual_page] != 0) {
+    if (m_tables[virtual_page] != 0) {
         if (pa)
-            *pa = page_tables[virtual_page] & PAGE_MASK;
+            *pa = m_tables[virtual_page] & PAGE_MASK;
         return 1;
     }
+
+    return 0;
 }
 
-void page_fault(registers_t *regs)
+void VirtualMemoryManager::pagefaultHandler(registers_t *regs)
 {
     uint32_t cr2;
     __asm volatile("mov %%cr2, %0" : "=r"(cr2));

@@ -17,12 +17,10 @@ void heap_init();
 void *kmalloc(size_t len);
 void kfree(void *p);
 
-#ifdef __cplusplus
-void *operator new(size_t len) { return kmalloc(len); }
-void *operator new[](size_t len) { return kmalloc(len); }
-void operator delete(void *p) { kfree(p); }
-void operator delete[](void *p) { kfree(p); }
-#endif//__cplusplus
+void inline *operator new(size_t len) { return kmalloc(len); }
+void inline *operator new[](size_t len) { return kmalloc(len); }
+void inline operator delete(void *p) { kfree(p); }
+void inline operator delete[](void *p) { kfree(p); }
 
 #endif//HEAP_H
 

@@ -18,22 +18,37 @@
 
 typedef uint32_t page_directory_t;
 
-// change address space
-void switch_page_directory(page_directory_t *pd);
+class VirtualMemoryManager {
+public:
+    enum PageFlags {
+        Present = 0x1,
+        Writeable = 0x2,
+        User = 0x4
+    };
 
-// maps physical memory pa to virtual mem va, with given flags
-void map(uint32_t va, uint32_t pa, uint32_t flags);
+    static void initialize();
 
-void unmap(uint32_t va);
+    /// switches active directory
+    static void switchDirectory(page_directory_t *directory);
 
-/// returns 1 if virtual address is mapped in address space
-/// puts physical address in pa if non-null
-char get_mapping(uint32_t va, uint32_t *pa);
+    /// maps physical memory pa to virtual mem va, with given flags
+    static void map(uint32_t va, uint32_t pa, uint32_t flags);
 
-// handler for page faults
-void page_fault(registers_t *regs);
+    /// removes a mapping from virtual to physical memory
+    static void unmap(uint32_t va);
 
-void vmm_init();
+    /// handler for page faults
+    static void pagefaultHandler(registers_t *regs);
 
+    /**
+     * returns 1 if virtual address is mapped in address space
+     * puts physical address in pa if non-null
+     */
+    static char getMapping(uint32_t va, uint32_t *pa);
+
+private:
+    static uint32_t *m_directory;
+    static uint32_t *m_tables;
+};
 
 #endif//VMM_H

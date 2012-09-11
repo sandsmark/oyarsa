@@ -6,7 +6,7 @@ thread_list_t *thread_list; // circular list
 
 void scheduler_init(thread_t *initial_thread)
 {
-    thread_list = kmalloc(sizeof(thread_list_t));
+    thread_list = new thread_list_t; // kmalloc(sizeof(thread_list_t));
     thread_list->thread = initial_thread;
     thread_list->next = thread_list;
 }
@@ -17,7 +17,7 @@ void thread_is_ready(thread_t *t)
     while (item->next)
         item = item->next;
 
-    thread_list_t *n = kmalloc(sizeof(thread_list_t));
+    thread_list_t *n = new thread_list_t; //kmalloc(sizeof(thread_list_t));
     n->thread = t;
     n->next = thread_list;
 

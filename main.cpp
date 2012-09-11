@@ -7,11 +7,12 @@ extern "C" {
 #include "effects.h"
 #include "timer.h"
 #include "elf.h"
-#include "pmm.h"
-#include "vmm.h"
-#include "scheduler.h"
 }
+#include "vmm.h"
+#include "pmm.h"
 #include "gdt.h"
+#include "scheduler.h"
+
 elf_t kernel_elf;
 
 extern "C" int kernel_main(multiboot_t *mboot)
@@ -25,9 +26,9 @@ extern "C" int kernel_main(multiboot_t *mboot)
     monitor_write("Initializing timer...\n");
     timer_init(20);
     monitor_write("Initializing physical memory...\n");
-    pmm_init(mboot->mem_upper);
+    PhysMemManager::initialize(mboot->mem_upper);
     monitor_write("Initializing virtual memory...\n");
-    vmm_init();
+    VirtualMemoryManager::initialize();
     monitor_write("Parsing ELF...\n");
     kernel_elf = elf_from_multiboot(mboot);
 
@@ -40,7 +41,7 @@ extern "C" int kernel_main(multiboot_t *mboot)
 
         if (map->type == 1) { // type == RAM
             for (uint32_t page = map->base_addr_low; page < map->base_addr_low + map->length_low; page += PAGE_SIZE) {
-                pmm_free_page(page);
+                PhysMemManager::freePage(page);
                 amount++;
             }
         }
