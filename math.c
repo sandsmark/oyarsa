@@ -3,28 +3,28 @@
 float sin(float n)
 {
     float ret;
-    __asm volatile("fsin" : "=t" (ret) : "0" (n));
+    __asm volatile("fsin" : "=t" (ret) : "0" (n) : "0");
     return ret;
 }
 
 float cos(float n)
 {
     float ret;
-    __asm volatile("fcos" : "=t" (ret) : "0" (n));
+    __asm volatile("fcos" : "=t" (ret) : "0" (n) : "0");
     return ret;
 }
 
 float sqrt(float n)
 {
     float ret;
-    __asm volatile("fsqrt" : "=t" (ret) : "0" (n));
+    __asm volatile("fsqrt" : "=t" (ret) : "0" (n) : "0");
     return ret;
 }
 
 float fabs(float n)
 {
     float ret;
-    __asm volatile("fabs" : "=t" (ret) : "0" (n));
+    __asm volatile("fabs" : "=t" (ret) : "0" (n) : "0");
     return ret;
 }
 
