@@ -12,10 +12,14 @@ uint32_t tick = 0;
 
 #define MODE_REPEATING 0x36
 
+void (*timer_handler)(uint32_t tick) = 0;
+
 static void timer_callback(registers_t *regs)
 {
-    tick++;
-
+    if (timer_handler) {
+        timer_handler(tick);
+        tick++;
+    }
 //    monitor_move_cursor(62, 0);
 //    monitor_write("Timer tick: ");
 //    monitor_write_dec(tick);

@@ -19,7 +19,7 @@ void effects_run()
     for (int i=0;i<=15;i++) monitor_put_styled('0'+i, i, 0);
     monitor_put('\n');
 
-    float t=0;
+/*    float t=0;
     while(1) {
         monitor_move_cursor(0, 1);
         t+=0.1;
@@ -28,5 +28,5 @@ void effects_run()
                 monitor_put_styled(' ', 0, (int)(f(x, y, t)*15));
             }
         }
-    }
+    }*/
 }

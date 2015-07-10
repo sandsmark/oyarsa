@@ -58,6 +58,9 @@ void idt_register_interrupt_handler (uint8_t n, interrupt_handler_t h);
 // Registers our IDT
 void idt_init();
 
+void nmi_enable();
+void nmi_disable();
+
 // references to handlers in idt_s.s
 extern void isr0 ();
 extern void isr1 ();

@@ -126,13 +126,23 @@ void irq_handler(registers_t *regs)
     if (interrupt_handlers[regs->int_no]) {
         interrupt_handlers[regs->int_no](regs);
     } else {
-        monitor_write("Unhandled interrupt!: ");
-        monitor_write_dec(regs->int_no);
-        monitor_put('\n');
+//        monitor_write("Unhandled interrupt!: ");
+//        monitor_write_dec(regs->int_no);
+//        monitor_put('\n');
     }
 
     if (regs->int_no >= 40) { // the slave
         outb(0xa0, 0x20); // reset slave
     }
     outb(0x20, 0x20); // reset master
+}
+
+void nmi_enable()
+{
+    outb(0x70, inb(0x70)&0x7F);
+}
+
+void nmi_disable()
+{
+    outb(0x70, inb(0x70)|0x80);
 }
