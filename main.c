@@ -10,6 +10,7 @@
 #include "pmm.h"
 #include "vmm.h"
 #include "scheduler.h"
+#include "sound.h"
 
 elf_t kernel_elf;
 extern void (*timer_handler)(uint32_t tick);
@@ -43,7 +44,7 @@ void doanim(uint32_t tick)
     monitor_move_cursor(0, 0);
     for (int i=0; i<79; i++) {
         int color = colors[(i/10) % 3];
-        const int textt = ((tick/3) % 80);
+        const int textt = ((tick/10) % 80);
         int offset = i - textt;
         if (offset >= 0 && offset < length) {
             monitor_put_styled(string[offset], color, 0);
@@ -68,7 +69,7 @@ void dowait(uint32_t tick)
     if (!firsttick) {
         firsttick = tick;
     }
-    if (tick - firsttick > 10) {
+    if (tick - firsttick > 1000) {
         timer_handler = &doanim;
     }
 }
@@ -118,6 +119,8 @@ int kernel_main(multiboot_t *mboot)
 
     monitor_write("=============\nBoot complete.\n============\n");
     monitor_write("Calculating hard...\n");
+
+    sound_play(440);
 
 //    effects_run();
     timer_handler = &dowait;

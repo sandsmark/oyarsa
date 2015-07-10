@@ -19,7 +19,6 @@ void (*timer_handler)(uint32_t tick) = 0;
 
 static void timer_callback(registers_t *regs)
 {
-    monitor_write("pikk\n");
     // We need to read register C to ensure that this is called again
     outb(PORT_SELECT_REG, REGISTER_C);
     inb(PORT_CMOS_CONF); // we don't care about the contents
