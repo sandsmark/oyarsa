@@ -5,39 +5,49 @@
 
 uint32_t tick = 0;
 
-#define PORT_COMMAND 0x43
-#define PORT_DATA1 0x40
-#define PORT_DATA2 0x41
-#define PORT_DATA3 0x42
+#define PORT_SELECT_REG 0x70
+#define PORT_CMOS_CONF 0x71
 
-#define MODE_REPEATING 0x36
+#define REGISTER_A 0x0A
+#define REGISTER_B 0x0B
+#define REGISTER_C 0x0C
+
+#define DISABLE_NMI 0x80
+#define ENABLE_RTC_IRQ 0x40
 
 void (*timer_handler)(uint32_t tick) = 0;
 
 static void timer_callback(registers_t *regs)
 {
+    monitor_write("pikk\n");
+    // We need to read register C to ensure that this is called again
+    outb(PORT_SELECT_REG, REGISTER_C);
+    inb(PORT_CMOS_CONF); // we don't care about the contents
+
     if (timer_handler) {
         timer_handler(tick);
         tick++;
     }
-//    monitor_move_cursor(62, 0);
-//    monitor_write("Timer tick: ");
-//    monitor_write_dec(tick);
-//    monitor_put('\n');
 }
 
-void timer_init(uint32_t freq)
+void timer_init(uint8_t rate)
 {
-    idt_register_interrupt_handler(IRQ0, &timer_callback);
-    outb(PORT_COMMAND, MODE_REPEATING);
+    // Register our interrupt handler
+    idt_register_interrupt_handler(IRQ8, &timer_callback); // RTC
 
-    // must fit inside 16 bits
-    uint32_t divisor = 1193180/freq;
+    outb(PORT_SELECT_REG, DISABLE_NMI | REGISTER_B); // select register B
 
-    // split the divisor into lower/higher parts, it is sent as nibbles
-    uint8_t low = (uint8_t)(divisor & 0xff);
-    uint8_t high = (uint8_t)((divisor >> 8) & 0xff);
+    // Get old value
+    uint8_t oldval = inb(PORT_CMOS_CONF);
 
-    outb(PORT_DATA1, low);
-    outb(PORT_DATA1, high);
+    outb(PORT_SELECT_REG, DISABLE_NMI | REGISTER_B); // select register B, reading resets to D
+
+    // Actually enable the interrupt without overwriting the existing value
+    outb(PORT_CMOS_CONF, oldval | ENABLE_RTC_IRQ);
+
+    // Now to set the frequency
+    outb(PORT_SELECT_REG, REGISTER_A);
+    oldval = inb(PORT_CMOS_CONF);
+    outb(PORT_SELECT_REG, REGISTER_A); // re-set to register a, stupid reads resetting to D
+    outb(PORT_CMOS_CONF, oldval | rate);
 }

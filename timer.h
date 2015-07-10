@@ -3,7 +3,7 @@
 
 #include "common.h"
 
-void timer_init(uint32_t frequency);
+void timer_init(uint8_t rate);
 
 #endif//TIMER_H
 

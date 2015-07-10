@@ -83,7 +83,7 @@ int kernel_main(multiboot_t *mboot)
     monitor_write("Initializing interrupt table...\n");
     idt_init();
     monitor_write("Initializing timer...\n");
-    timer_init(10);
+    timer_init(7);
     monitor_write("Initializing physical memory...\n");
     pmm_init(mboot->mem_upper);
     monitor_write("Initializing virtual memory...\n");
