@@ -15,7 +15,7 @@
 elf_t kernel_elf;
 extern void (*timer_handler)(uint32_t tick);
 
-const char string [] = "greets to indigo/zomgtronics/bitflavour. code:martin,gfx:noone,msx:a deaf guy.";
+const char string [] = "code: martin. greets: indigo/zomgtronics/bitflavour/ninjadev/darklite/outracks.";
 int colors[] = { 7, 8, 15 };
 
 
@@ -27,8 +27,8 @@ float g(float x, float y, float t)
     float v1 = sin(distance(x, y, px, py));
 
     float v2 = sin(sin(t)*x/(37+15*cos(y))) * cos(y/(31 +11*sin(x)));
-    return (v1 + v2) /2;
-    //return (sin(x/16.0) + sin(y/32.0) + sin(distance(x, t*y, 80, 12)/8.0) + sin(sqrt(x*x+y*y))/8.0) / 4.0;
+    //return (v1 + v2) /2;
+    return (sin(x/16.0) + sin(y/32.0) + sin(distance(x, t*y, 80, 12)/8.0) + sin(sqrt(x*x+y*y))/8.0) / 4.0;
 }
 
 float f(float x, float y, float t)
@@ -43,7 +43,7 @@ void doanim(uint32_t tick)
     int length = strlen(string);
     monitor_move_cursor(0, 0);
     for (int i=0; i<79; i++) {
-        int color = colors[(i/10) % 3];
+        int color = colors[((i - tick)/10) % 3];
         const int textt = ((tick/10) % 80);
         int offset = i - textt;
         if (offset >= 0 && offset < length) {
@@ -51,13 +51,15 @@ void doanim(uint32_t tick)
         } else if (i < (textt + length) % 80 && textt + length > 80) {
             monitor_put_styled(string[length - (((textt + length) % 80) - i)], color, 0);
         } else {
-            monitor_put(' ');
+            monitor_put('~');
         }
     }
     monitor_put('\n');
-    for (int y=0; y<22; y++) {
+    for (int y=0; y<23; y++) {
         for (int x=0; x<80; x++) {
-            monitor_put_styled(' ', 0, (int)(g(x, y, (float)tick/20.0)*15) % 15);
+            monitor_put_styled(' ',
+                    0,
+                    (int)(f(x, y, (float)tick/20.0)*15 + 7) % 15);
             //monitor_put_styled(' ', 0, colors[(int)(f(x, y, (float)t/20.0)*3)]);
         }
     }
@@ -77,7 +79,7 @@ void dowait(uint32_t tick)
 int kernel_main(multiboot_t *mboot)
 {
     monitor_clear();
-    monitor_write("oyarsa 0.1\n");
+    monitor_write("Single Effect OS 0.1\n");
 
     monitor_write("Initializing global descriptor table...\n");
     gdt_init();
@@ -88,7 +90,7 @@ int kernel_main(multiboot_t *mboot)
     monitor_write("Initializing physical memory...\n");
     pmm_init(mboot->mem_upper);
     monitor_write("Initializing virtual memory...\n");
-    vmm_init();
+ //   vmm_init();
     monitor_write("Parsing kernel ELF...\n");
     kernel_elf = elf_from_multiboot(mboot);
 
@@ -117,8 +119,8 @@ int kernel_main(multiboot_t *mboot)
     monitor_write("Enabling interrupts...\n");
     __asm volatile("sti");
 
-    monitor_write("=============\nBoot complete.\n============\n");
-    monitor_write("Calculating hard...\n");
+    monitor_write("Boot complete.\n");
+    monitor_write("Calculating hard...\n(... well, not really, but I want to show what it actually does)\n");
 
     sound_play(440);
 
